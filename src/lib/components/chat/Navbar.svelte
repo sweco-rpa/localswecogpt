@@ -86,7 +86,7 @@
 		></div>
 
 		<div class=" flex max-w-full w-full mx-auto px-1.5 md:px-2 pt-0.5 bg-transparent">
-			<div class="flex items-center w-full max-w-full">
+			<div class="flex items-center w-full max-w-full relative">
 				{#if $mobile && !$showSidebar}
 					<div
 						class="-translate-x-0.5 mr-1 mt-1 self-start flex flex-none items-center text-gray-600 dark:text-gray-400"
@@ -114,6 +114,27 @@
 					{#if showModelSelector}
 						<ModelSelector bind:selectedModels showSetDefault={!shareEnabled} />
 					{/if}
+				</div>
+
+				<div
+					class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 flex items-center justify-center mb-1"
+				>
+					<img
+						crossorigin="anonymous"
+						src="/static/sweco_favicon.png"
+						class="dark:hidden p-2"
+						id="logo-light"
+						alt="logo"
+						style="max-height: 54px; max-width: 128px;"
+					/>
+					<img
+						crossorigin="anonymous"
+						src="/static/sweco_favicon_dark.png"
+						class="hidden dark:block p-2"
+						id="logo-dark"
+						alt="logo"
+						style="max-height: 54px; max-width: 128px;"
+					/>
 				</div>
 
 				<div class="self-start flex flex-none items-center text-gray-600 dark:text-gray-400">
