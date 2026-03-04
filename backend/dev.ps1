@@ -52,15 +52,42 @@ if (-not $env:PORT) {
     $env:PORT = 8080
 }
 
-# Read Foundry port from status.txt and configure connection
+# Read Foundry port from status.txt and configure OpenAI-compatible endpoint
 $statusFile = Join-Path $PSScriptRoot "..\..\..\..\status.txt"
 if (Test-Path $statusFile) {
     $statusContent = Get-Content $statusFile -Raw
     if ($statusContent -match "http://127\.0\.0\.1:(\d+)") {
         $foundryPort = $matches[1]
-        $env:OLLAMA_API_BASE_URL = "http://localhost:$foundryPort/openai/api"
-        Write-Host "Configured Foundry connection on port: $foundryPort" -ForegroundColor Green
+        $foundryOpenAIBaseUrl = "http://localhost:$foundryPort/v1"
+
+        # Foundry exposes OpenAI-compatible routes under /v1
+        $env:ENABLE_OPENAI_API = "True"
+        $env:OPENAI_API_BASE_URL = $foundryOpenAIBaseUrl
+        $env:OPENAI_API_BASE_URLS = $foundryOpenAIBaseUrl
+        $env:OPENAI_API_KEY = ""
+        $env:OPENAI_API_KEYS = ""
+
+        Write-Host "Configured Foundry OpenAI endpoint: $foundryOpenAIBaseUrl" -ForegroundColor Green
+
+        # Disable Ollama API only when Ollama is not installed to avoid wrong /api/* calls.
+        $ollamaInstalled = $false
+        if (Get-Command ollama -ErrorAction SilentlyContinue) {
+            $ollamaInstalled = $true
+        } elseif (Test-Path "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe") {
+            $ollamaInstalled = $true
+        }
+
+        if (-not $ollamaInstalled) {
+            $env:ENABLE_OLLAMA_API = "False"
+            Write-Host "Ollama not detected. Disabled Ollama API; Foundry will be used by default." -ForegroundColor Yellow
+        } else {
+            Write-Host "Ollama detected. Leaving Ollama API enabled." -ForegroundColor Gray
+        }
+    } else {
+        Write-Host "Could not parse Foundry port from status.txt. Skipping Foundry endpoint setup." -ForegroundColor Yellow
     }
+} else {
+    Write-Host "status.txt not found. Skipping Foundry endpoint setup." -ForegroundColor Yellow
 }
 
 
