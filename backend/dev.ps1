@@ -58,10 +58,11 @@ if (Test-Path $statusFile) {
     $statusContent = Get-Content $statusFile -Raw
     if ($statusContent -match "http://127\.0\.0\.1:(\d+)") {
         $foundryPort = $matches[1]
-        $env:OLLAMA_API_BASE_URL = "http://localhost:11434"
+        $env:OLLAMA_API_BASE_URL = "http://localhost:$foundryPort/openai/api"
         Write-Host "Configured Foundry connection on port: $foundryPort" -ForegroundColor Green
     }
 }
+
 
 # Optional: print which Python is used (good for troubleshooting)
 Write-Host "Using Python: $PythonExe"
